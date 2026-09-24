@@ -45,11 +45,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/dashboard',
-        destination: '/',
-        permanent: true,
-      },
-      {
         source: '/scalar',
         destination: '/',
         permanent: true,
