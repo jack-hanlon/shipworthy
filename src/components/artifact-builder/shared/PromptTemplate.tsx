@@ -37,7 +37,6 @@ import type { FileUIPart } from "ai";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMicTranscription } from "@/hooks/use-mic-transcription";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 import { useUserContext } from "@/contexts/UserContext";
 import { buildDashboardHref } from "@/lib/dashboard-url";
@@ -489,15 +488,17 @@ export const PromptTemplate: React.FC = () => {
                             return (
                                 <Button
                                     key={suggestion.label}
-                                    asChild
+                                    type="button"
                                     variant="outline"
                                     size="sm"
                                     className="capitalize h-8 p-4 text-xs dark:bg-darkGray dark:border-none z-10 cursor-pointer rounded-full px-4"
+                                    onClick={() => {
+                                        setIsLoading(true);
+                                        router.push(buildDashboardHref({ empty: true }));
+                                    }}
                                 >
-                                    <Link href={"/dashboard?empty=true"}>
-                                        {suggestion.icon}
-                                        {suggestion.label}
-                                    </Link>
+                                    {suggestion.icon}
+                                    {suggestion.label}
                                 </Button>
                             );
                         }
