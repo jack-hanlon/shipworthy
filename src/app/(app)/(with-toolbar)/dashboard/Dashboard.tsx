@@ -28,6 +28,7 @@ import { CHAT_MESSAGES_KEY, COLLAPSED_SIZE, EXPANDED_SIZE, SIDEBAR_POSITION_KEY,
 import { useDebouncedCallback } from "use-debounce";
 import { useUserContext } from "@/contexts/UserContext";
 import { buildAuthLoginHref } from "@/lib/sign-in-return";
+import { buildDashboardHref } from "@/lib/dashboard-url";
 import { useDashboardActions } from "@/contexts/DashboardActionsContext";
 import { isChatSessionInsertConfirmed } from "@/api/chat-history";
 import { ToolbarPortalButtons } from "@/components/artifact-builder/shared/ToolbarPortalButtons";
@@ -297,7 +298,7 @@ export function Dashboard() {
 
     useEffect(() => {
         if (shouldBareRedirectToEmpty) {
-            router.replace("/dashboard?empty=true");
+            router.replace(buildDashboardHref({ empty: true }));
         }
     }, [shouldBareRedirectToEmpty, router]);
 

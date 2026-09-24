@@ -64,6 +64,7 @@ import { newPathLeaveGuard } from "@/hooks/create-leave-guard";
 import { BUILDER_DRAFT_KEY, clearBuilderDraft } from "@/lib/builder-draft";
 import { deleteChatHistory, setChatPinned, updateChatTitle } from "@/api/chat-history";
 import { buildAuthLoginHref } from "@/lib/sign-in-return";
+import { buildDashboardHref } from "@/lib/dashboard-url";
 
 const CHAT_MESSAGES_KEY = "messages";
 
@@ -156,7 +157,7 @@ export function AppSidebar() {
     };
 
     const startNewChat = useCallback(() => {
-        const href = "/dashboard?empty=true";
+        const href = buildDashboardHref({ empty: true });
         const prepareEmptyChat = () => {
             clearBuilderDraft();
             clearChat();
@@ -238,7 +239,7 @@ export function AppSidebar() {
             });
 
             if (deleteDraft.id === selectedChatId) {
-                const href = "/dashboard?empty=true";
+                const href = buildDashboardHref({ empty: true });
                 const leaveBlocked = newPathLeaveGuard.requestLeave(href, () => {
                     clearChat();
                     closeMobileSidebar();
