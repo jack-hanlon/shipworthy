@@ -2,7 +2,7 @@
 
 Hackathon template: hero chat dispatches into a builder with a chat panel and a structured **Chat artifact** (week/day grid for now). Brand and agent chrome are domain-neutral (**Shipworthy** / **Agent**).
 
-Gut of a former Proxima clone. History: [ADR 0033](docs/adr/complete/0033-shipworthy-hackathon-template/index.md). Shipped keep-set for this tree: [ADR 0034](docs/adr/0034-fitness-strip-artifact-crud/index.md). Copy to `hackathon_template` when you want a clean remote.
+Gut of a former Proxima clone. History: [ADR 0033](docs/adr/complete/0033-shipworthy-hackathon-template/index.md). Shipped keep-set for this tree: [ADR 0034](docs/adr/complete/0034-fitness-strip-artifact-crud/index.md). Copy to `hackathon_template` when you want a clean remote.
 
 ## What you get
 
@@ -65,4 +65,4 @@ npm run build
 
 ## Contracts
 
-ADR 0034 contracts C1–C16 are the acceptance bar (includes residual 0033 checks). Sub-plan [08](docs/adr/0034-fitness-strip-artifact-crud/08-verify.md) lists the verify greps.
+ADR 0034 contracts C1–C16 are the acceptance bar (includes residual 0033 checks). Sub-plan [08](docs/adr/complete/0034-fitness-strip-artifact-crud/08-verify.md) lists the verify greps.
