@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}"
-DB_CONTAINER="${SUPABASE_DB_CONTAINER:-supabase_db_proxima_landing}"
+DB_CONTAINER="${SUPABASE_DB_CONTAINER:-supabase_db_shipworthy}"
 SNIPPET_DIR="supabase/snippets"
 
 run_sql_file() {

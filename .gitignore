@@ -37,3 +37,6 @@ yarn-error.log*
 
 # local domain docs / ADRs
 docs/
+
+# Sample Workspace scrape staging (real logins / bodies)
+data/sample-workspace/raw/

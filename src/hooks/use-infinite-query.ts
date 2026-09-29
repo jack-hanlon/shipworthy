@@ -14,50 +14,47 @@
  * Used by: list/feed views that need "load more" pagination (e.g. exercise library, workout history)
  */
 
-import { createClient } from '@/utils/supabase/client'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
-import { Database } from './supabase'
+import { createClient } from "@/utils/supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { Database } from "./supabase";
 
-const supabase = createClient()
-
-/*
- * --------------------------------------------------------------------------
- *  Type-level plumbing: extracts row types from the generated Database type
- *  so every consumer of useInfiniteQuery gets end-to-end type safety.
- * --------------------------------------------------------------------------
- */
-
-/** Typed Supabase client for compile-time method resolution. */
-type TTypedClient = SupabaseClient<Database>
+const supabase = createClient();
 
 /** The `public` schema of the database. */
-type TDatabaseSchema = Database['public']
+type TDatabaseSchema = Database["public"];
 
 /** Union of all table names in the public schema. */
-type TSupabaseTableName = keyof TDatabaseSchema['Tables']
+type TSupabaseTableName = keyof TDatabaseSchema["Tables"];
 
 /** Row type for a given table name. */
-type TSupabaseTableData<T extends TSupabaseTableName> = TDatabaseSchema['Tables'][T]['Row']
+type TSupabaseTableData<T extends TSupabaseTableName> =
+  TDatabaseSchema["Tables"][T]["Row"];
 
 /**
- * Return type of `typedClient.from(table).select(...)`.
- * Derived from the client's own types to avoid dual-package mismatches
- * between top-level and supabase-js-nested `@supabase/postgrest-js`.
+ * Return type of `client.from(table).select(...)` for one table.
+ * Instantiated from the same call the store makes, so the filter callback
+ * and `.range()` share one builder type.
  */
+function selectPage<T extends TSupabaseTableName>(
+  tableName: T,
+  columns: string,
+) {
+  return (supabase as SupabaseClient<Database>)
+    .from(tableName)
+    .select(columns, { count: "exact" });
+}
+
 type TSupabaseSelectBuilder<T extends TSupabaseTableName = TSupabaseTableName> =
-  T extends TSupabaseTableName
-    ? ReturnType<ReturnType<TTypedClient['from']>['select']>
-    : never
+  ReturnType<typeof selectPage<T>>;
 
 /**
  * A transformer applied to the Supabase select builder before execution.
  * Use it to add filters, ordering, etc. Any `.range()` call will be
  * overwritten by the pagination logic.
  */
-type TSupabaseQueryHandler<T extends TSupabaseTableName = TSupabaseTableName> = (
-  query: TSupabaseSelectBuilder<T>
-) => TSupabaseSelectBuilder<T>
+type TSupabaseQueryHandler<T extends TSupabaseTableName = TSupabaseTableName> =
+  (query: TSupabaseSelectBuilder<T>) => TSupabaseSelectBuilder<T>;
 
 /**
  * Configuration for {@link useInfiniteQuery}.
@@ -66,27 +63,34 @@ type TSupabaseQueryHandler<T extends TSupabaseTableName = TSupabaseTableName> = 
  */
 interface IUseInfiniteQueryProps<T extends TSupabaseTableName> {
   /** The Supabase table to paginate over. */
-  tableName: T
+  tableName: T;
   /** PostgREST column selection string (default `"*"`). */
-  columns?: string
+  columns?: string;
   /** Number of rows fetched per page (default `20`). */
-  pageSize?: number
+  pageSize?: number;
   /** Optional query modifier for filtering/ordering. `.range()` is appended automatically. */
-  trailingQuery?: TSupabaseQueryHandler<T>
+  trailingQuery?: TSupabaseQueryHandler<T>;
 }
 
 /** Internal pagination state managed by the external store. */
 interface IStoreState<TData> {
-  data: TData[]
-  count: number
-  isSuccess: boolean
-  isLoading: boolean
-  isFetching: boolean
-  error: Error | null
-  hasInitialFetch: boolean
+  data: TData[];
+  count: number;
+  isSuccess: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
+  error: Error | null;
+  hasInitialFetch: boolean;
 }
 
-type TListener = () => void
+type TListener = () => void;
+
+function rowId(row: unknown): unknown {
+  if (typeof row !== "object" || row === null || !("id" in row)) {
+    return undefined;
+  }
+  return row.id;
+}
 
 /**
  * Creates a standalone pagination store that lives outside of React's state
@@ -96,10 +100,11 @@ type TListener = () => void
  * @param props - Query configuration (table, columns, page size, filters).
  * @returns An object with `getState`, `subscribe`, `fetchNextPage`, and `initialize`.
  */
-function createStore<TData extends TSupabaseTableData<T>, T extends TSupabaseTableName>(
-  props: IUseInfiniteQueryProps<T>
-) {
-  const { tableName, columns = '*', pageSize = 20, trailingQuery } = props
+function createStore<
+  TData extends TSupabaseTableData<T>,
+  T extends TSupabaseTableName,
+>(props: IUseInfiniteQueryProps<T>) {
+  const { tableName, columns = "*", pageSize = 20, trailingQuery } = props;
 
   let state: IStoreState<TData> = {
     data: [],
@@ -109,72 +114,80 @@ function createStore<TData extends TSupabaseTableData<T>, T extends TSupabaseTab
     isFetching: false,
     error: null,
     hasInitialFetch: false,
-  }
+  };
 
-  const listeners = new Set<TListener>()
+  const listeners = new Set<TListener>();
 
   const notify = () => {
-    listeners.forEach((listener) => listener())
-  }
+    listeners.forEach((listener) => listener());
+  };
 
   const setState = (newState: Partial<IStoreState<TData>>) => {
-    state = { ...state, ...newState }
-    notify()
-  }
+    state = { ...state, ...newState };
+    notify();
+  };
 
   /** Fetches a single page starting at `skip`. Guards against concurrent or exhausted fetches. */
   const fetchPage = async (skip: number) => {
-    if (state.hasInitialFetch && (state.isFetching || state.count <= state.data.length)) return
+    if (
+      state.hasInitialFetch &&
+      (state.isFetching || state.count <= state.data.length)
+    )
+      return;
 
-    setState({ isFetching: true })
+    setState({ isFetching: true });
 
-    let query = (supabase as SupabaseClient<Database>)
-      .from(tableName)
-      .select(columns, { count: 'exact' }) as TSupabaseSelectBuilder
+    let query: TSupabaseSelectBuilder<T> = selectPage(tableName, columns);
 
     if (trailingQuery) {
-      query = trailingQuery(query)
+      query = trailingQuery(query);
     }
-    const { data: newData, count, error } = await query.range(skip, skip + pageSize - 1)
+    const {
+      data: newData,
+      count,
+      error,
+    } = await query.range(skip, skip + pageSize - 1);
 
     if (error) {
-      console.error('An unexpected error occurred:', error)
-      setState({ error })
+      console.error("An unexpected error occurred:", error);
+      setState({ error });
     } else {
-        // Deduplicate by `id` to prevent duplicates when rows shift between pages during concurrent inserts.
-        const deduplicatedData = ((newData || []) as TData[]).filter(
-            (item) => !state.data.find((old) => (old as Record<string, unknown>).id === (item as Record<string, unknown>).id)
-        )
-          setState({
+      // Deduplicate by `id` to prevent duplicates when rows shift between pages during concurrent inserts.
+      const pageRows: unknown[] = Array.isArray(newData) ? newData : [];
+      const deduplicatedData = pageRows.filter((item): item is TData => {
+        const id = rowId(item);
+        return !state.data.some((old) => rowId(old) === id);
+      });
+      setState({
         data: [...state.data, ...deduplicatedData],
         count: count || 0,
         isSuccess: true,
         error: null,
-      })
+      });
     }
-    setState({ isFetching: false })
-  }
+    setState({ isFetching: false });
+  };
 
   const fetchNextPage = async () => {
-    if (state.isFetching) return
-    await fetchPage(state.data.length)
-  }
+    if (state.isFetching) return;
+    await fetchPage(state.data.length);
+  };
 
   const initialize = async () => {
-    setState({ isLoading: true, isSuccess: false, data: [] })
-    await fetchNextPage()
-    setState({ isLoading: false, hasInitialFetch: true })
-  }
+    setState({ isLoading: true, isSuccess: false, data: [] });
+    await fetchNextPage();
+    setState({ isLoading: false, hasInitialFetch: true });
+  };
 
   return {
     getState: () => state,
     subscribe: (listener: TListener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
     fetchNextPage,
     initialize,
-  }
+  };
 }
 
 /** SSR-safe snapshot: useSyncExternalStore returns this on the server to avoid hydration mismatches. */
@@ -186,7 +199,7 @@ const initialState: unknown = {
   isFetching: false,
   error: null,
   hasInitialFetch: false,
-}
+};
 
 /**
  * Paginate over a Supabase table with infinite-scroll semantics.
@@ -203,20 +216,20 @@ function useInfiniteQuery<
   TData extends TSupabaseTableData<T>,
   T extends TSupabaseTableName = TSupabaseTableName,
 >(props: IUseInfiniteQueryProps<T>) {
-  const storeRef = useRef(createStore<TData, T>(props))
+  const storeRef = useRef(createStore<TData, T>(props));
 
   const subscribe = useCallback((onStoreChange: () => void) => {
-    return storeRef.current.subscribe(onStoreChange)
-  }, [])
+    return storeRef.current.subscribe(onStoreChange);
+  }, []);
 
-  const getSnapshot = useCallback(() => storeRef.current.getState(), [])
+  const getSnapshot = useCallback(() => storeRef.current.getState(), []);
 
   const getServerSnapshot = useCallback(
     () => initialState as IStoreState<TData>,
     [],
-  )
+  );
 
-  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
     // Recreate store if props change
@@ -226,18 +239,18 @@ function useInfiniteQuery<
         props.columns !== props.columns ||
         props.pageSize !== props.pageSize)
     ) {
-      storeRef.current = createStore<TData, T>(props)
+      storeRef.current = createStore<TData, T>(props);
     }
 
-    if (!state.hasInitialFetch && typeof window !== 'undefined') {
-      storeRef.current.initialize()
+    if (!state.hasInitialFetch && typeof window !== "undefined") {
+      storeRef.current.initialize();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.tableName, props.columns, props.pageSize, state.hasInitialFetch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.tableName, props.columns, props.pageSize, state.hasInitialFetch]);
 
   const fetchNextPage = useCallback(() => {
-    return storeRef.current.fetchNextPage()
-  }, [])
+    return storeRef.current.fetchNextPage();
+  }, []);
 
   return {
     data: state.data,
@@ -248,7 +261,7 @@ function useInfiniteQuery<
     error: state.error,
     hasMore: state.count > state.data.length,
     fetchNextPage,
-  }
+  };
 }
 
 export {
@@ -257,4 +270,4 @@ export {
   type TSupabaseTableData,
   type TSupabaseTableName,
   type IUseInfiniteQueryProps,
-}
+};

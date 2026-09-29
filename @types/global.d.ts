@@ -1,89 +1,82 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/hooks/supabase";
 import type {
-    TProgram as _TProgram,
-    TFeatureLimits as _TFeatureLimits,
-    TUserDetails as _TUserDetails,
-    TBlog as _TBlog,
-    TPolicyVersionRow as _TPolicyVersionRow,
-    TUserConsentsRow as _TUserConsentsRow,
-    TBlockedUserRow as _TBlockedUserRow,
-    TFollowersRow as _TFollowersRow,
-    TFollowingRow as _TFollowingRow,
-
-    TBackedUpWorkout as _TBackedUpWorkout,
-    TWorkoutExerciseRow as _TWorkoutExerciseRow,
-    THevyExerciseTemplateRow as _THevyExerciseTemplateRow,
+  TFeatureLimits as _TFeatureLimits,
+  TUserDetails as _TUserDetails,
+  TBlog as _TBlog,
+  TFollowersRow as _TFollowersRow,
+  TFollowingRow as _TFollowingRow,
 } from "@/types/database";
 
 declare global {
-// Here we will define the global types for the project and the union types
+  // Here we will define the global types for the project and the union types
 
-// Re-exports from src/types/database.ts (canonical source of truth for Supabase-backed types)
-type TProgram = _TProgram;
-type TFeatureLimits = _TFeatureLimits;
-type TUserDetails = _TUserDetails;
-type TBlog = _TBlog;
-type TPolicyVersionRow = _TPolicyVersionRow;
-type TUserConsentsRow = _TUserConsentsRow;
-type TBlockedUserRow = _TBlockedUserRow;
-type TFollowersRow = _TFollowersRow;
-type TFollowingRow = _TFollowingRow;
-type TBackedUpWorkout = _TBackedUpWorkout;
-type TWorkoutExerciseRow = _TWorkoutExerciseRow;
-type THevyExerciseTemplateRow = _THevyExerciseTemplateRow;
+  // Re-exports from src/types/database.ts (canonical source of truth for Supabase-backed types)
+  type TFeatureLimits = _TFeatureLimits;
+  type TUserDetails = _TUserDetails;
+  type TBlog = _TBlog;
+  type TFollowersRow = _TFollowersRow;
+  type TFollowingRow = _TFollowingRow;
 
-// Generic Types
+  // Generic Types
 
+  type TGenericCard = TCard | TArtifactCard;
+  type TGenericDialog = TDialog | TArtifactDialog;
+  type TGenericAddExercise = TAddExercise | TArtifactAddExercise;
+  type TGenericRepsTypes = TRepsTypes | TArtifactRepsTypes;
+  type TGenericIntensityTypes = TIntensityTypes | TArtifactIntensityTypes;
+  type TGenericDay = TProgramCreatorDay | TArtifactDay;
 
-type TGenericCard = TCard | TArtifactCard;
-type TGenericDialog = TDialog | TArtifactDialog;
-type TGenericAddExercise = TAddExercise | TArtifactAddExercise;
-type TGenericRepsTypes = TRepsTypes | TArtifactRepsTypes;
-type TGenericIntensityTypes = TIntensityTypes | TArtifactIntensityTypes;
-type TGenericDay = TProgramCreatorDay | TArtifactDay;
+  // Universal Types
 
-// Universal Types
-
-type TBreadcrumb = {
+  type TBreadcrumb = {
     href: string;
     label: string;
-}
+  };
 
-type TQuote = {
+  type TQuote = {
     quote: string;
     author: string;
-}
+  };
 
-
-type TFilterGroupOption = {
+  type TFilterGroupOption = {
     component: "badge" | "slider" | "combobox";
-    type: "program_length" | "workout_duration" | "equipment" | "specialization" | "difficulty";
-    title: "Program Length" | "Workout Duration" | "Equipment" | "Specialization" | "Difficulty";
+    type:
+      | "program_length"
+      | "workout_duration"
+      | "equipment"
+      | "specialization"
+      | "difficulty";
+    title:
+      | "Program Length"
+      | "Workout Duration"
+      | "Equipment"
+      | "Specialization"
+      | "Difficulty";
     values: string[];
-}
+  };
 
-type TProgramFilters = {
+  type TProgramFilters = {
     specialization?: string[];
     difficulty?: string[];
     program_length?: string;
     workout_duration?: string;
     equipment?: string;
     title?: string;
-};
+  };
 
-type TTextToJsonSchema =
-    "workout_history_schema" |
-    "program_creator_day_schema" |
-    "saved_workout_schema" |
-    "one_day_schema" | // Schema for 1 Workout
-    "ppl_schema" | // Schema for Push, Pull, Legs Split
-    "ul_schema" | // Schema for Upper Lower Split
-    "cblsa_schema" | // Schema for Chest, Back, Legs, Shoulders, Arms Split
-    "pplc_schema" | // Schema for Push, Pull, Legs, Cardio Split
-    "hevy_routine_schema";
+  type TTextToJsonSchema =
+    | "workout_history_schema"
+    | "program_creator_day_schema"
+    | "saved_workout_schema"
+    | "one_day_schema" // Schema for 1 Workout
+    | "ppl_schema" // Schema for Push, Pull, Legs Split
+    | "ul_schema" // Schema for Upper Lower Split
+    | "cblsa_schema" // Schema for Chest, Back, Legs, Shoulders, Arms Split
+    | "pplc_schema" // Schema for Push, Pull, Legs, Cardio Split
+    | "hevy_routine_schema";
 
-type TTextToJsonRequest = {
+  type TTextToJsonRequest = {
     empty: string; // used to open a program builder with no AI
     search: string; // goes into AI Prompt
     sex: string; // goes into AI Prompt
@@ -92,7 +85,7 @@ type TTextToJsonRequest = {
     specificDays: string; // Ignore for now
     programLength: string; // builder program length
     workoutDuration: string; // Ignore for now
-    activityLevel: string;  // goes into AI Prompt
+    activityLevel: string; // goes into AI Prompt
     goals: string; // goes into AI Prompt
     specialization: string; // goes into AI Prompt
     equipment: string; // goes into AI Prompt
@@ -110,66 +103,64 @@ type TTextToJsonRequest = {
     warmupExercises: string; // Questionnaire: warmup exercises (yes | no).
     programTitle: string; // goes into AI Prompt
     explore: string; // goes into AI Prompt
-}
+  };
 
-type TMessage = {
+  type TMessage = {
     id: number;
     role: "user" | "assistant";
     content: string;
-}
+  };
 
-type TPolicyVersionSummary = {
+  type TPolicyVersionSummary = {
     id: string;
     versionLabel: string;
     effectiveAt: string;
-};
+  };
 
-type TCurrentPolicyVersions = {
+  type TCurrentPolicyVersions = {
     terms: TPolicyVersionSummary;
     privacy: TPolicyVersionSummary;
-};
+  };
 
-type TUserConsentsLegalFields = {
+  type TUserConsentsLegalFields = {
     terms_version_id: string;
     privacy_version_id: string;
-};
+  };
 
-
-type TOptionalConsentUpdates = {
+  type TOptionalConsentUpdates = {
     platformImprovementOptIn?: boolean;
     marketingOptIn?: boolean;
-};
+  };
 
-type TLegalAcceptanceInput = {
+  type TLegalAcceptanceInput = {
     termsVersionId: string;
     privacyVersionId: string;
-};
+  };
 
-type TOptionalConsentPatch = {
+  type TOptionalConsentPatch = {
     platform_improvement_opt_in?: boolean;
     platform_improvement_opt_in_at?: string | null;
     marketing_opt_in?: boolean;
     marketing_opt_in_at?: string | null;
     updated_at: string;
-};
+  };
 
-type TPutUserConsentsInput = {
+  type TPutUserConsentsInput = {
     termsVersionId?: string;
     privacyVersionId?: string;
-} & TOptionalConsentUpdates;
+  } & TOptionalConsentUpdates;
 
-
-/** One completed workout from `GET /v1/workouts` or `GET /v1/workouts/{id}`. */
-type THevyWorkoutExercise = {
+  /** One completed workout from `GET /v1/workouts` or `GET /v1/workouts/{id}`. */
+  type THevyWorkoutExercise = {
     index: number;
     title: string;
     notes?: string;
     exercise_template_id: string;
     superset_id?: number | null;
     sets: TArtifactSet[];
-};
+  };
 
-type THevyWorkout = {
+  type THevyWorkout = {
     id: string;
     title: string;
     description?: string;
@@ -180,32 +171,32 @@ type THevyWorkout = {
     created_at?: string;
     /** Hevy routine this session was logged from. Null for ad-hoc sessions. */
     routine_id?: string | null;
-};
+  };
 
-type THevyWorkoutsResponse = {
+  type THevyWorkoutsResponse = {
     page: number;
     page_count: number;
     workouts: THevyWorkout[];
-};
+  };
 
-/**
- * One entry from `GET /v1/workouts/events?since=` — Hevy's delta feed.
- * A created or edited session arrives as `updated` with the full workout; a
- * removed one as `deleted` with only its id. This is the only signal that
- * reports deletions, which never move the workout count.
- */
-type THevyWorkoutEvent =
+  /**
+   * One entry from `GET /v1/workouts/events?since=` — Hevy's delta feed.
+   * A created or edited session arrives as `updated` with the full workout; a
+   * removed one as `deleted` with only its id. This is the only signal that
+   * reports deletions, which never move the workout count.
+   */
+  type THevyWorkoutEvent =
     | { type: "updated"; workout: THevyWorkout }
     | { type: "deleted"; id: string; deleted_at: string };
 
-type THevyWorkoutEventsResponse = {
+  type THevyWorkoutEventsResponse = {
     page: number;
     page_count: number;
     events: THevyWorkoutEvent[];
-};
+  };
 
-/** One body-measurement entry from `GET /v1/body_measurements` (Hevy OpenAPI BodyMeasurement). */
-type THevyBodyMeasurement = {
+  /** One body-measurement entry from `GET /v1/body_measurements` (Hevy OpenAPI BodyMeasurement). */
+  type THevyBodyMeasurement = {
     date: string;
     weight_kg?: number | null;
     lean_mass_kg?: number | null;
@@ -224,29 +215,28 @@ type THevyBodyMeasurement = {
     right_thigh?: number | null;
     left_calf?: number | null;
     right_calf?: number | null;
-};
+  };
 
-type THevyBodyMeasurementsResponse = {
+  type THevyBodyMeasurementsResponse = {
     page: number;
     page_count: number;
     body_measurements: THevyBodyMeasurement[];
-};
+  };
 
-type TBodyMeasurementsDb = SupabaseClient<Database>;
+  type TBodyMeasurementsDb = SupabaseClient<Database>;
 
-type TImportHevyBodyMeasurementResult =
-    | { status: "upserted"; id: string }
-    | { status: "error"; message: string };
+  type TImportHevyBodyMeasurementResult =
+    { status: "upserted"; id: string } | { status: "error"; message: string };
 
-type TWorkoutHistoryDb = SupabaseClient<Database>;
+  type TWorkoutHistoryDb = SupabaseClient<Database>;
 
-type TImportHevyWorkoutResult =
+  type TImportHevyWorkoutResult =
     | { status: "inserted"; workoutId: string }
     | { status: "skipped"; workoutId: string }
     | { status: "patched"; workoutId: string }
     | { status: "error"; message: string };
 
-type TSyncChunkResult = {
+  type TSyncChunkResult = {
     backedUpCount: number;
     hevyCount: number;
     syncError: string | null;
@@ -255,127 +245,123 @@ type TSyncChunkResult = {
     rateLimited?: boolean;
     /** Per-chunk diagnostics for logging and UI hints. */
     chunk?: {
-        page: number;
-        pageCount: number;
-        inserted: number;
-        skipped: number;
+      page: number;
+      pageCount: number;
+      inserted: number;
+      skipped: number;
     };
-};
+  };
 
-type TWorkoutSyncProgress = Pick<TSyncChunkResult, "backedUpCount" | "hevyCount" | "syncError" | "rateLimited"> & {
+  type TWorkoutSyncProgress = Pick<
+    TSyncChunkResult,
+    "backedUpCount" | "hevyCount" | "syncError" | "rateLimited"
+  > & {
     /** User paused background sync for this browser session. */
     paused?: boolean;
-};
+  };
 
-type TWorkoutHistoryCursor = {
+  type TWorkoutHistoryCursor = {
     startedAt: string;
     id: string;
-};
+  };
 
-type TWorkoutHistoryQueryOptions = {
+  type TWorkoutHistoryQueryOptions = {
     limit?: number;
     since?: string;
     canonicalExerciseIds?: string[];
     cursorStartedAt?: string;
     cursorId?: string;
-};
+  };
 
-type TWorkoutHistoryPage = {
-    workouts: TBackedUpWorkout[];
-    nextCursor: TWorkoutHistoryCursor | null;
-};
-
-type TLoggedWorkoutPreviewItem = {
+  type TLoggedWorkoutPreviewItem = {
     workout: TArtifactDay;
     totalExerciseCount: number;
-};
+  };
 
-type TLoggedWorkoutBrowsePage = {
+  type TLoggedWorkoutBrowsePage = {
     workouts: TLoggedWorkoutPreviewItem[];
     nextCursor: TWorkoutHistoryCursor | null;
-};
+  };
 
-type TProfileStatisticsWeekBucket = {
+  type TProfileStatisticsWeekBucket = {
     weekStart: string;
     durationSeconds: number;
     reps: number;
     volumeKg: number;
-};
+  };
 
-type TProfileStatisticsChart = {
+  type TProfileStatisticsChart = {
     weeks: 4 | 12;
     thisWeek: {
-        durationSeconds: number;
-        reps: number;
-        volumeKg: number;
+      durationSeconds: number;
+      reps: number;
+      volumeKg: number;
     };
     buckets: TProfileStatisticsWeekBucket[];
-};
+  };
 
-type TProfileStatisticsResponse = TProfileStatisticsChart & {
+  type TProfileStatisticsResponse = TProfileStatisticsChart & {
     weekStreak: number;
     thisWeekWorkouts: number;
     avgWorkoutsPerWeek: number | null;
-};
+  };
 
-type TProfileCalendarWorkout = {
+  type TProfileCalendarWorkout = {
     id: string;
     title: string;
     started_at: string;
     ended_at: string;
-};
+  };
 
-type TProfileCalendarResponse = {
+  type TProfileCalendarResponse = {
     workouts: TProfileCalendarWorkout[];
-};
+  };
 
-type TMapBackedUpWorkoutOptions = {
+  type TMapBackedUpWorkoutOptions = {
     previewMaxExercises?: number;
-};
+  };
 
-
-type TRoutineResponse = {
+  type TRoutineResponse = {
     routine: TArtifactDay;
   };
 
-
-type TExerciseStallResult = {
+  type TExerciseStallResult = {
     name: string;
     weight: number;
     color: "green" | "yellow" | "red";
     trend: number[];
     hasStall: boolean;
     sessions: Array<{
-        workoutId: string;
-        date: string;
-        totalVolume: number;
-        maxWeight: number;
-        /** Total reps in the workout (for bodyweight display when totalVolume is 0). */
-        totalReps?: number;
+      workoutId: string;
+      date: string;
+      totalVolume: number;
+      maxWeight: number;
+      /** Total reps in the workout (for bodyweight display when totalVolume is 0). */
+      totalReps?: number;
     }>;
-};
+  };
 
-type TSelectOption = {
+  type TSelectOption = {
     [key: string]: string | boolean | undefined;
     value: string;
     label: string;
     disable?: boolean;
     fixed?: boolean;
-};
+  };
 
-type TMultiSelectRef = {
+  type TMultiSelectRef = {
     selectedValue: TSelectOption[];
     input: HTMLInputElement;
     focus: () => void;
     reset: () => void;
-};
+  };
 
-type TQuestionOption = {
+  type TQuestionOption = {
     id: string;
     label: string;
-};
+  };
 
-type TQuestion = {
+  type TQuestion = {
     id: string;
     question: string;
     options: TQuestionOption[];
@@ -385,12 +371,12 @@ type TQuestion = {
     /** Default `core`. `advanced` reserved for extender catalogs. */
     section?: "core" | "advanced";
     subtitle?: { text: string; link?: string };
-};
+  };
 
-/** ADR 0034 / C10: clarify stubs or none. Fitness reasons deleted. */
-type TQuestionnaireGateReason = "clarify" | "none";
+  /** ADR 0034 / C10: clarify stubs or none. Fitness reasons deleted. */
+  type TQuestionnaireGateReason = "clarify" | "none";
 
-type TQuestionsPayload = {
+  type TQuestionsPayload = {
     questions: TQuestion[];
     userRequest?: string;
     initialAnswers?: Record<string, string | string[]>;
@@ -398,117 +384,114 @@ type TQuestionsPayload = {
     allowSkip?: boolean;
     /** Continue chat with answers on the next body (no profile persistence). */
     completeAction?: "continue";
-};
+  };
 
-type THevyProgramItem = {
+  type THevyProgramItem = {
     program_title: string;
     program: TArtifactDay[];
-};
+  };
 
-type TTestStatus = "passed" | "failed" | "okay" | "running";
+  type TTestStatus = "passed" | "failed" | "okay" | "running";
 
-type TBlindSpotSortOption = "most_activity" | "alphabetical";
+  type TBlindSpotSortOption = "most_activity" | "alphabetical";
 
-type TBlindSpotStatusFilter = "all" | "progressing" | "stalling" | "stalled";
+  type TBlindSpotStatusFilter = "all" | "progressing" | "stalling" | "stalled";
 
-type TBlindSpotAnalysisSectionProps = {
+  type TBlindSpotAnalysisSectionProps = {
     artifactPrograms?: THevyProgramItem[] | undefined;
     isLoadingHevy?: boolean;
-};
+  };
 
-type TLandingSectionVariant = "white" | "tint";
+  type TLandingSectionVariant = "white" | "tint";
 
-type TPrescriptionDisplayOptions = {
+  type TPrescriptionDisplayOptions = {
     selected?: boolean;
-};
+  };
 
-type TConversationMessage = {
+  type TConversationMessage = {
     role: "user" | "assistant" | "system" | "data" | "tool";
     content: string;
-};
+  };
 
-interface IPoundsOrKgContextValue {
-	isInLbs: boolean;
-	toggleModePreference: () => void;
-}
+  interface IPoundsOrKgContextValue {
+    isInLbs: boolean;
+    toggleModePreference: () => void;
+  }
 
+  interface IProfilePictureContextValue {
+    profilePicture: Blob | null;
+    setProfilePicture: (newPicture: Blob | null) => void;
+  }
 
-
-interface IProfilePictureContextValue {
-	profilePicture: Blob | null;
-	setProfilePicture: (newPicture: Blob | null) => void;
-}
-
-interface ISkillMetadata {
+  interface ISkillMetadata {
     name: string;
     description: string;
     path: string;
     allowedTools?: string[];
-}
+  }
 
-interface ISandbox {
-    readFile(path: string, encoding: 'utf-8'): Promise<string>;
+  interface ISandbox {
+    readFile(path: string, encoding: "utf-8"): Promise<string>;
     readdir(
-        path: string,
-        opts: { withFileTypes: true },
+      path: string,
+      opts: { withFileTypes: true },
     ): Promise<{ name: string; isDirectory(): boolean }[]>;
     exec(command: string): Promise<{ stdout: string; stderr: string }>;
-}
+  }
 
+  /**
+   * Chat artifact grid shapes (ADR 0033 / C8).
+   * `folder_id` = 0-based week index; `order` = 1-based day within the week.
+   * Hevy folder/API request types below this block stay Hevy-named (C9 fossils / sync).
+   */
 
-/**
- * Chat artifact grid shapes (ADR 0033 / C8).
- * `folder_id` = 0-based week index; `order` = 1-based day within the week.
- * Hevy folder/API request types below this block stay Hevy-named (C9 fossils / sync).
- */
-
-type THevyRoutineFolderResponse = {
+  type THevyRoutineFolderResponse = {
     page: number;
     page_count: number;
     routine_folders: THevyRoutineFolder[];
-}
+  };
 
-type THevyRoutineFolder = {
+  type THevyRoutineFolder = {
     id: number; // The routine folder ID
     index: number; // The routine folder index. Describes the order of the folder in the list.
     title: string; // The routine folder title
     updated_at: string; // ISO 8601 timestamp of when the routine was last updated. example: 2021-09-14T12:00:00Z
     created_at: string; // ISO 8601 timestamp of when the routine was created. example: 2021-09-14T12:00:00Z
-}
+  };
 
-/**
- * **Artifact item** — titled line on a Chat artifact day (ADR 0034).
- * Canonical JSON field names; keep aligned with `src/api/artifacts.ts` parsers.
- */
-type TArtifactItem = {
+  /**
+   * **Artifact item** — titled line on a Chat artifact day (ADR 0034).
+   * Canonical JSON field names; keep aligned with `src/api/artifacts.ts` parsers.
+   */
+  type TArtifactItem = {
     id: string;
     title: string;
     notes?: string;
-};
+  };
 
-/** Nested day inside Chat artifact JSON (not the flat grid `TArtifactDay` fossil). */
-type TArtifactDayDocument = {
+  /** Nested day inside Chat artifact JSON (not the flat grid `TArtifactDay` fossil). */
+  type TArtifactDayDocument = {
     id: string;
     title: string;
     items: TArtifactItem[];
-};
+  };
 
-/** One week of Artifact days in Chat artifact JSON. */
-type TArtifactWeekDocument = {
+  /** One week of Artifact days in Chat artifact JSON. */
+  type TArtifactWeekDocument = {
     days: TArtifactDayDocument[];
-};
+  };
 
-/** Chat artifact JSON document stored in `artifacts.document`. */
-type TChatArtifactDocument = {
+  /** Chat artifact JSON document stored in `artifacts.document`. */
+  type TChatArtifactDocument = {
     title: string;
     weeks: TArtifactWeekDocument[];
-};
+  };
 
-/** Alias matching the API module export name. */
-type TArtifactItemDocument = TArtifactItem;
+  /** Alias matching the API module export name. */
+  type TArtifactItemDocument = TArtifactItem;
 
-/** One **Artifact day** column in the Chat artifact grid (flat fossil for chat body until CRUD tools). */
-type TArtifactDay = {
+  /** One **Artifact day** column in the Chat artifact grid (flat fossil for chat body until CRUD tools). */
+  type TArtifactDay = {
     id: string; // Builder key: ordinal string, minted locally. Not an external id on Edit path.
     /**
      * External day UUID when the day was loaded from a Hevy folder (ADR 0013 / 02).
@@ -529,10 +512,10 @@ type TArtifactDay = {
     exercises: TArtifactExercise[];
     notes: string;
     /* Drag-and-drop day index; not stored in the DB */
-    order?: string // 1-indexed day within the week
-}
+    order?: string; // 1-indexed day within the week
+  };
 
-type TArtifactExercise = {
+  type TArtifactExercise = {
     index: number; // 0-based position in the day's exercises[] array.
     title: string;
     notes: string;
@@ -554,24 +537,24 @@ type TArtifactExercise = {
      * assumed to be valid where it is going. Never sent to Hevy under this key.
      */
     shared_template?: THevySharedTemplate;
-}
+  };
 
-/**
- * Exercise template metadata a **Hevy share import** carried across, in Hevy's own
- * `POST /v1/exercise_templates` vocabulary.
- *
- * Values are raw share strings - the endpoints are undocumented, so nothing is trusted to be a
- * valid Hevy enum until `mapSharedTemplateToPostExercise` narrows it.
- */
-type THevySharedTemplate = {
+  /**
+   * Exercise template metadata a **Hevy share import** carried across, in Hevy's own
+   * `POST /v1/exercise_templates` vocabulary.
+   *
+   * Values are raw share strings - the endpoints are undocumented, so nothing is trusted to be a
+   * valid Hevy enum until `mapSharedTemplateToPostExercise` narrows it.
+   */
+  type THevySharedTemplate = {
     title: string;
     exercise_type: string | null;
     equipment_category: string | null;
     muscle_group: string | null;
     other_muscles: string[];
-}
+  };
 
-type TArtifactSet = {
+  type TArtifactSet = {
     index: number; // 0-based position in the exercise's sets[] array.
     type: string; // The type of set. This can be one of 'normal', 'warmup', 'dropset', 'failure'
     weight_kg: number | null; // Weight lifted in kilograms
@@ -581,38 +564,95 @@ type TArtifactSet = {
     rpe: number | null; // The RPE logged for the set
     custom_metric: number | null; // Custom metric logged for the set (Currently only used to log floors or steps for stair machine exercises)
     rep_range: TArtifactRepRange | null;
-}
+  };
 
-type TArtifactRepRange = {
+  type TArtifactRepRange = {
     start: number;
     end: number;
-}
+  };
 
-
-type THevyPostExerciseTemplateRequest = {
+  type THevyPostExerciseTemplateRequest = {
     exercise: THevyPostExerciseTemplate;
-}
+  };
 
-type THevyPostExerciseTemplate = {
+  type THevyPostExerciseTemplate = {
     title: string;
-    exercise_type: "weight_reps" | "reps_only" | "bodyweight_reps" | "bodyweight_assisted_reps" | "duration" | "weight_duration" | "distance_duration" | "short_distance_weight";
-    equipment_category: "none" | "barbell" | "dumbbell" | "kettlebell" | "machine" | "plate" | "resistance_band" | "suspension" | "other";
-    muscle_group: "abdominals" | "shoulders" | "biceps" | "triceps" | "forearms" | "quadriceps" | "hamstrings" | "calves" | "glutes" | "abductors" | "adductors" | "lats" | "upper_back" | "traps" | "lower_back" | "chest" | "cardio" | "neck" | "full_body" | "other";
-    other_muscles: ("abdominals" | "shoulders" | "biceps" | "triceps" | "forearms" | "quadriceps" | "hamstrings" | "calves" | "glutes" | "abductors" | "adductors" | "lats" | "upper_back" | "traps" | "lower_back" | "chest" | "cardio" | "neck" | "full_body" | "other")[];
-}
+    exercise_type:
+      | "weight_reps"
+      | "reps_only"
+      | "bodyweight_reps"
+      | "bodyweight_assisted_reps"
+      | "duration"
+      | "weight_duration"
+      | "distance_duration"
+      | "short_distance_weight";
+    equipment_category:
+      | "none"
+      | "barbell"
+      | "dumbbell"
+      | "kettlebell"
+      | "machine"
+      | "plate"
+      | "resistance_band"
+      | "suspension"
+      | "other";
+    muscle_group:
+      | "abdominals"
+      | "shoulders"
+      | "biceps"
+      | "triceps"
+      | "forearms"
+      | "quadriceps"
+      | "hamstrings"
+      | "calves"
+      | "glutes"
+      | "abductors"
+      | "adductors"
+      | "lats"
+      | "upper_back"
+      | "traps"
+      | "lower_back"
+      | "chest"
+      | "cardio"
+      | "neck"
+      | "full_body"
+      | "other";
+    other_muscles: (
+      | "abdominals"
+      | "shoulders"
+      | "biceps"
+      | "triceps"
+      | "forearms"
+      | "quadriceps"
+      | "hamstrings"
+      | "calves"
+      | "glutes"
+      | "abductors"
+      | "adductors"
+      | "lats"
+      | "upper_back"
+      | "traps"
+      | "lower_back"
+      | "chest"
+      | "cardio"
+      | "neck"
+      | "full_body"
+      | "other"
+    )[];
+  };
 
-/** Success body for `POST /v1/exercise_templates`. OpenAPI documents `{ id: number }` but the live API may return a raw UUID string body. */
-type THevyPostCustomExerciseResponse = {
+  /** Success body for `POST /v1/exercise_templates`. OpenAPI documents `{ id: number }` but the live API may return a raw UUID string body. */
+  type THevyPostCustomExerciseResponse = {
     id: number | string;
-};
+  };
 
-type THevyExerciseTemplates = {
+  type THevyExerciseTemplates = {
     page: number; // Current page number
     page_count: number; // Total number of pages
-    exercise_templates: THevyExerciseTemplate[]
-}
+    exercise_templates: THevyExerciseTemplate[];
+  };
 
-type THevyExerciseTemplate = {
+  type THevyExerciseTemplate = {
     id: string; // The exercise template ID.
     title: string; // The exercise title.
     type: string; // The exercise type.
@@ -623,19 +663,24 @@ type THevyExerciseTemplate = {
     normalized_title: string; // The normalized title of the exercise
     gif_id: string; // The GIF ID of the exercise
     instructions: string[]; // The instructions of the exercise
-}
+  };
 
-type TArtifactDialog = {
+  type TArtifactDialog = {
     folder_id: number;
     dayOrder: number;
     isOpen: boolean;
     exerciseIndex?: number; // location of exercise to be edited
     editExercise?: TArtifactAddExercise; // current value of exercise to be edited
-}
+  };
 
-type TArtifactAddExercise = {
+  type TArtifactAddExercise = {
     selectedExercise: THevyExerciseTemplate;
-    repTypeValue: "reps" | "reps_range" | "distance_meters" | "duration_seconds" | "custom_metric";
+    repTypeValue:
+      | "reps"
+      | "reps_range"
+      | "distance_meters"
+      | "duration_seconds"
+      | "custom_metric";
     reps: number[] | null; // DATA for fixed reps / distance / time / custom (not rep range)
     /** Per-set rep range start when `repTypeValue` is `"reps_range"`. */
     repRangeStart?: number[] | null;
@@ -647,53 +692,51 @@ type TArtifactAddExercise = {
     rpe: (number | null)[] | null;
     setTypes: ("normal" | "warmup" | "dropset" | "failure")[];
     restSeconds: string | null;
-}
+  };
 
-type TArtifactRepsTypes = {
-    reps?: number[],
-    distance_meters?: number[],
-    duration_seconds?: number[],
-    custom_metric?: number[],
-}
+  type TArtifactRepsTypes = {
+    reps?: number[];
+    distance_meters?: number[];
+    duration_seconds?: number[];
+    custom_metric?: number[];
+  };
 
-type TArtifactIntensityTypes = {
-    rpe?: number[],
-    weight_kg?: number[],
-}
+  type TArtifactIntensityTypes = {
+    rpe?: number[];
+    weight_kg?: number[];
+  };
 
+  type TArtifactCard = {
+    title: string;
+    order: string;
+    day_title: string;
+    exercises: TArtifactExercise[];
+    id: string;
+    folder_id: number;
+  };
 
-type TArtifactCard = {
-    title: string,
-    order: string,
-    day_title: string,
-    exercises: TArtifactExercise[],
-    id: string,
-    folder_id: number,
-}
-
-
-type THevyRoutineRequestObject = {
+  type THevyRoutineRequestObject = {
     routine: THevyRoutineRequest;
-}
+  };
 
-type THevyRoutineRequest = {
+  type THevyRoutineRequest = {
     title: string; // The routine title
     folder_id: number | null; // An ID for the folder this routine corresponds to. (Also used to choose the week routine is assigned in drag and drop)
     notes: string;
     updated_at?: string; // ISO 8601 timestamp of when the routine was last updated. example: 2021-09-14T12:00:00Z
     created_at?: string; // ISO 8601 timestamp of when the routine was created. example: 2021-09-14T12:00:00Z
     exercises: THevyExerciseRequest[];
-}
+  };
 
-type THevyExerciseRequest = {
+  type THevyExerciseRequest = {
     exercise_template_id: string;
     superset_id: number | null;
     rest_seconds: number;
     notes: string;
     sets: THevySetRequest[];
-}
+  };
 
-type THevySetRequest = {
+  type THevySetRequest = {
     type: string;
     weight_kg: number | null;
     reps: number | null;
@@ -701,9 +744,9 @@ type THevySetRequest = {
     duration_seconds: number | null;
     custom_metric: number | null;
     rep_range?: TArtifactRepRange | null;
-}
+  };
 
-type TRoutineFolderResponse = {
+  type TRoutineFolderResponse = {
     id: number;
     index: number;
     title: string;
@@ -711,11 +754,11 @@ type TRoutineFolderResponse = {
     created_at: string;
   };
 
-type THevyExerciseHistory = {
+  type THevyExerciseHistory = {
     exercise_history: THevyExerciseHistoryEntry[];
-}
+  };
 
-type THevyExerciseHistoryEntry = {
+  type THevyExerciseHistoryEntry = {
     workout_id: string;
     workout_title: string;
     workout_start_time: string;
@@ -728,104 +771,99 @@ type THevyExerciseHistoryEntry = {
     rpe: number | null;
     custom_metric: number | null;
     set_type: string; // (warmup, normal, dropset, failure)
-}
+  };
 
-type TRoutineFolderRequest = {
+  type TRoutineFolderRequest = {
     routine_folder: {
-        title: string;
-    }
-}
+      title: string;
+    };
+  };
 
-
-type TProgramTitle = {
+  type TProgramTitle = {
     id: string;
     title: string;
-}
+  };
 
-// Interfaces
-/**********************************************************/
+  // Interfaces
+  /**********************************************************/
 
+  /** A Proxima Program in the Program Builder is defined as: */
+  /***********************************************************/
 
-
-/** A Proxima Program in the Program Builder is defined as: */
-/***********************************************************/
-
-type TProgramCreatorDay = {
-    order: string, // 1-indexed
+  type TProgramCreatorDay = {
+    order: string; // 1-indexed
     day_title?: string;
     exercises?: TProgramCreatorExercise[];
     /* These two fields are used for the drag and drop but not stored in the DB */
     weekOrder?: string; // 0-indexed
     notes: string; // Day notes
     id?: string;
-}
+  };
 
-type TProgramCreatorExercise = {
+  type TProgramCreatorExercise = {
     notes?: string;
     hevy_exercise_templates?: THevyExerciseTemplate;
     sets?: number;
     sets_type?: ("normal" | "warmup" | "dropset" | "failure")[];
     reps_type?: TRepsTypes;
     intensity?: TIntensityTypes;
-}
+  };
 
-type TIntensityTypes = {
+  type TIntensityTypes = {
     rpe?: number[];
     rpe_range?: number[][];
     percent_rm?: number[];
     weights?: number[];
-}
+  };
 
-type TRepsTypes = {
+  type TRepsTypes = {
     reps?: number[];
     reps_range?: Array<[number, number] | null>;
     reps_max?: number[];
     amrap?: string[];
     time_taken?: number[];
     time_range?: number[][];
-}
+  };
 
-
-type TProgramPage = {
-    program: TProgram[];
-    schedule: TProgramDetails[];
-}
-
-
-type TDialog = {
+  type TDialog = {
     weekOrder: number;
     dayOrder: number;
     isOpen: boolean;
     exerciseIndex?: number; // location of exercise to be edited
     editExercise?: TAddExercise; // current value of exercise to be edited
-}
+  };
 
-type TAddExercise = {
+  type TAddExercise = {
     id: string;
-    repTypeValue: "reps" | "reps_max" | "reps_range" | "time_taken" | "time_range" | "amrap" ;
+    repTypeValue:
+      | "reps"
+      | "reps_max"
+      | "reps_range"
+      | "time_taken"
+      | "time_range"
+      | "amrap";
     intensityValue: "percent_rm" | "rpe_range" | "rpe" | "weights";
     reps: number[]; // DATA for any rep type that is not a range
     intensityData: number[]; // DATA for any intensity that is not a range
     repsWithTimeAndRepRange: number[][]; // DATA for rep/time range
     intensityDataWithRPERange: number[][]; // DATA for rpe range
     setTypes: ("normal" | "warmup" | "dropset" | "failure")[];
-}
+  };
 
-
-type TProgramDetails = {
+  type TProgramDetails = {
     id?: string;
     title?: string;
     schedule_workouts: TScheduleWorkouts[];
-}
+  };
 
-type TScheduleWorkouts = {
+  type TScheduleWorkouts = {
     nthDay: number;
     nthWeek: number;
     day_title?: string;
     program_workout_exercises: TSavedWorkoutExercise[];
-}
+  };
 
-type TSavedWorkoutExercise = {
+  type TSavedWorkoutExercise = {
     /** Per-set fixed reps; null when that set uses a range. */
     reps?: Array<number | null>;
     reps_max?: number[];
@@ -839,9 +877,9 @@ type TSavedWorkoutExercise = {
     percent_rm?: number[];
     weights?: number[];
     hevy_exercise_templates?: THevyExerciseTemplate;
-}
+  };
 
-type TAPIProgramWorkoutExercises = {
+  type TAPIProgramWorkoutExercises = {
     reps?: Array<number | null>;
     weights?: number[];
     reps_max?: number[];
@@ -853,19 +891,19 @@ type TAPIProgramWorkoutExercises = {
     amrap?: string[];
     percent_rm?: number[];
     hevy_exercise_templates?: THevyExerciseTemplate;
-};
+  };
 
-type TCard = {
-    title: string,
-    order: string,
-    day_title: string,
-    exercises: TProgramCreatorExercise[],
-    id: string,
-    weekOrder: string,
-}
+  type TCard = {
+    title: string;
+    order: string;
+    day_title: string;
+    exercises: TProgramCreatorExercise[];
+    id: string;
+    weekOrder: string;
+  };
 
-/** buildProgram tool result shape: week-1 routines, the plan it landed with, aggregate counts, optional error. */
-interface IBuildProgramOutput {
+  /** buildProgram tool result shape: week-1 routines, the plan it landed with, aggregate counts, optional error. */
+  interface IBuildProgramOutput {
     routines?: TArtifactDay[];
     /** Plan fields + Periodization wave from the same call (ADR 0030 / 01). */
     plan?: { durationWeeks?: number; periodizationWave?: unknown };
@@ -875,25 +913,26 @@ interface IBuildProgramOutput {
     setCount?: number;
     error?: string;
     message?: string;
-}
+  }
 
-// Training profile (CONTEXT catalogs)
-// Sex: `"male" | "female" | ""` - empty = prefer-not-to-say / unset (DB NULL). No sentinel.
+  // Training profile (CONTEXT catalogs)
+  // Sex: `"male" | "female" | ""` - empty = prefer-not-to-say / unset (DB NULL). No sentinel.
 
-/** Closed sex catalog; empty = prefer not to say / unset. */
-type TTrainingSex = "male" | "female" | "";
+  /** Closed sex catalog; empty = prefer not to say / unset. */
+  type TTrainingSex = "male" | "female" | "";
 
-/** Experience level catalog (difficultyOptions). */
-type TExperienceLevel = "beginner" | "novice" | "intermediate" | "advanced" | "";
+  /** Experience level catalog (difficultyOptions). */
+  type TExperienceLevel =
+    "beginner" | "novice" | "intermediate" | "advanced" | "";
 
-/** Physique phase catalog. */
-type TPhysiquePhase = "bulk" | "cut" | "maintain" | "recomp" | "";
+  /** Physique phase catalog. */
+  type TPhysiquePhase = "bulk" | "cut" | "maintain" | "recomp" | "";
 
-/**
- * Training focus catalog (CONTEXT **Training focus**).
- * Slugs are storage IDs; UI labels live in training-profile-options (SP2).
- */
-type TTrainingFocus =
+  /**
+   * Training focus catalog (CONTEXT **Training focus**).
+   * Slugs are storage IDs; UI labels live in training-profile-options (SP2).
+   */
+  type TTrainingFocus =
     | "bodybuilding"
     | "powerbuilding"
     | "powerlifting"
@@ -907,14 +946,15 @@ type TTrainingFocus =
     | "rehab_pain_aware"
     | "";
 
-/**
- * Activity level catalog - CONTEXT short forms for the existing 5-option set
- * (form-options labels map onto these on save in SP2/SP3).
- */
-type TActivityLevel = "sedentary" | "light" | "moderate" | "high" | "extreme" | "";
+  /**
+   * Activity level catalog - CONTEXT short forms for the existing 5-option set
+   * (form-options labels map onto these on save in SP2/SP3).
+   */
+  type TActivityLevel =
+    "sedentary" | "light" | "moderate" | "high" | "extreme" | "";
 
-/** Structured Training profile used by Edit profile, peek, and chat. */
-type TTrainingProfile = {
+  /** Structured Training profile used by Edit profile, peek, and chat. */
+  type TTrainingProfile = {
     /** Integer years 14-100; null when unset. */
     age: number | null;
     /** Empty string = prefer not to say / unset. */
@@ -927,7 +967,7 @@ type TTrainingProfile = {
     activityLevel: TActivityLevel;
     /** Session duration cap in minutes (10-180, step 10); null when unset. */
     sessionDurationMin: number | null;
-};
+  };
 }
 
 export {};

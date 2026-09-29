@@ -12,7 +12,7 @@ Gut of a former Proxima clone. History: [ADR 0033](docs/adr/complete/0033-shipwo
 - Skill sandbox tools (`loadSkill`, `readFile`, `bash`) plus optional `getMoreInfoQuestions`
 - Auth pages and Free metering
 
-Fitness builder residue, Soft-fail, Agentic memory, and Hevy export/sync chrome are out of the template happy path. Unused fitness / `hevy_*` DB tables may still exist in migrations; the app does not read or write them.
+Fitness builder residue, Soft-fail, Agentic memory, and Hevy export/sync chrome are out of the template happy path. Fitness and `hevy_*` tables are not in the repo migrations.
 
 Glossary: [`CONTEXT.md`](CONTEXT.md).
 
@@ -49,7 +49,7 @@ See [`.env.template`](.env.template).
 | Supabase anon URL/key | Yes for app data | `NEXT_PUBLIC_REACT_APP_SUPABASE_*` |
 | `OPENAI_API_KEY` | Yes for `/api/chat` | Anon + authenticated chat |
 | `SUPABASE_SECRET_KEY` | Server paths | Service role; never expose to the client |
-| Stripe keys | Optional / unused | Upgrade UI stripped; leave blank |
+| Stripe Sync Engine | Bring your own project | Set `NEXT_PUBLIC_REACT_APP_SUPABASE_*` to a Supabase project that already has Stripe Sync Engine. The hosted demo does not accept a Stripe secret. |
 | Payload / blog Supabase | Unused | Blog/admin routes stripped |
 | Hevy share keys | Unused | Export/sync chrome stripped |
 | PostHog | Optional | Analytics |

@@ -13,7 +13,7 @@ fi
 
 TYPES_FILE="src/hooks/supabase.ts"
 DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-DB_CONTAINER="supabase_db_proxima_landing"
+DB_CONTAINER="supabase_db_shipworthy"
 
 # BSD sed (macOS) needs `sed -i ''`; GNU sed (Linux) wants `sed -i`
 sed_inplace() {
@@ -75,7 +75,7 @@ if grep -q "^NEXT_PUBLIC_REACT_APP_SUPABASE_URL=https://" "$ENV_FILE"; then
 
     # Comment out production values
     sed_inplace 's|^NEXT_PUBLIC_REACT_APP_SUPABASE_URL=https://|# PROD # NEXT_PUBLIC_REACT_APP_SUPABASE_URL=https://|' "$ENV_FILE"
-    sed_inplace 's|^NEXT_PUBLIC_REACT_APP_SUPABASE_KEY=eyJ|# PROD # NEXT_PUBLIC_REACT_APP_SUPABASE_KEY=eyJ|' "$ENV_FILE"
+    sed_inplace 's|^NEXT_PUBLIC_REACT_APP_SUPABASE_KEY=|# PROD # NEXT_PUBLIC_REACT_APP_SUPABASE_KEY=|' "$ENV_FILE"
 
     # Append local values
     cat >> "$ENV_FILE" <<EOF
@@ -94,7 +94,7 @@ echo "==> Running migrations..."
 npx supabase migration up --local
 
 # ── Restart Kong proxy (can get stale after db reset) ────────────────
-docker restart supabase_kong_proxima_landing >/dev/null 2>&1 || true
+docker restart supabase_kong_shipworthy >/dev/null 2>&1 || true
 sleep 3
 
 # ── 7. Create test user + seed required rows ─────────────────────────

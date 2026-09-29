@@ -25,9 +25,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import {
   buildToolErrorPayload,
-  submitToolErrorToDeveloper,
   summarizeToolError,
-  type TToolErrorContext,
 } from "@/components/artifact-builder/shared/agent/tool-error";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,11 +42,10 @@ import {
   CircleIcon,
   ClockIcon,
   CopyIcon,
-  SendHorizonalIcon,
   WrenchIcon,
   XCircleIcon,
 } from "lucide-react";
-import { isValidElement, useCallback, useState } from "react";
+import { isValidElement, useCallback } from "react";
 import { toast } from "sonner";
 
 import { CodeBlock } from "./code-block";
@@ -140,7 +137,7 @@ export const ToolHeader = ({
     <CollapsibleTrigger
       className={cn(
         "flex w-full items-center justify-between gap-4 p-3",
-        className
+        className,
       )}
       {...props}
     >
@@ -167,7 +164,7 @@ export const ToolContent = ({ className, ...props }: TToolContentProps) => (
   <CollapsibleContent
     className={cn(
       "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 space-y-4  text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
-      className
+      className,
     )}
     {...props}
   />
@@ -197,10 +194,6 @@ export const ToolInput = ({ className, input, ...props }: TToolInputProps) => (
 export type TToolErrorPanelProps = ComponentProps<"div"> & {
   summary: string;
   copyPayload: string;
-  tool: string;
-  errorCtx: TToolErrorContext;
-  chatId?: string;
-  getChatId?: () => string;
   severity?: "error" | "warning";
 };
 
@@ -208,41 +201,20 @@ export const ToolErrorPanel = ({
   className,
   summary,
   copyPayload,
-  tool,
-  errorCtx,
-  chatId = "",
-  getChatId,
   severity = "error",
   ...props
 }: TToolErrorPanelProps) => {
-  const [isSending, setIsSending] = useState(false);
-
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(copyPayload).then(() => {
       toast.success("Error details copied");
     });
   }, [copyPayload]);
 
-  const handleSendToDeveloper = useCallback(() => {
-    if (isSending) return;
-
-    setIsSending(true);
-    const resolvedChatId = getChatId?.() ?? chatId;
-    void submitToolErrorToDeveloper(tool, errorCtx, resolvedChatId).then((result) => {
-      setIsSending(false);
-      if (result.ok === false) {
-        toast.error(result.message);
-        return;
-      }
-      toast.success("Error sent to developer");
-    });
-  }, [chatId, errorCtx, getChatId, isSending, tool]);
-
   return (
     <div
       className={cn(
         "flex flex-col gap-3 p-4 pb-4 bg-muted/50 rounded-lg border border-border",
-        className
+        className,
       )}
       {...props}
     >
@@ -250,7 +222,7 @@ export const ToolErrorPanel = ({
         <span
           className={cn(
             "mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full",
-            severity === "warning" ? "bg-orange-500" : "bg-red-500"
+            severity === "warning" ? "bg-orange-500" : "bg-red-500",
           )}
         />
         <p className="min-w-0 text-sm text-muted-foreground">{summary}</p>
@@ -262,21 +234,9 @@ export const ToolErrorPanel = ({
           size="sm"
           className="w-fit rounded-full"
           onClick={handleCopy}
-          disabled={isSending}
         >
           <CopyIcon className="mr-2 size-4" />
           Copy
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="w-fit rounded-full"
-          onClick={handleSendToDeveloper}
-          disabled={isSending}
-        >
-          <SendHorizonalIcon className="mr-2 size-4" />
-          {isSending ? "Sending…" : "Send to Developer"}
         </Button>
       </div>
     </div>
@@ -314,12 +274,7 @@ export const ToolOutput = ({
 
     return (
       <div className={cn("space-y-2", className)} {...props}>
-        <ToolErrorPanel
-          summary={summary}
-          copyPayload={copyPayload}
-          tool={tool}
-          errorCtx={{ errorText, output }}
-        />
+        <ToolErrorPanel summary={summary} copyPayload={copyPayload} />
       </div>
     );
   }

@@ -1,7 +1,13 @@
--- Seed data required by the application (idempotent).
+-- Metering caps from src/api/feature-limits.ts (TEST_TIER_LIMITS).
+-- max_premium_llm_requests stays null.
 
-INSERT INTO public.policy_versions (document_type, version_label, effective_at)
+INSERT INTO public.product_usage_limits (
+  product_title,
+  max_monthly_exports,
+  max_monthly_llm_requests
+)
 VALUES
-  ('terms_of_use', '2026-06-17', timestamptz '2026-06-17 00:00:00+00'),
-  ('privacy_policy', '2026-06-17', timestamptz '2026-06-17 00:00:00+00')
-ON CONFLICT DO NOTHING;
+  ('Free', 2, 45),
+  ('Pro', 3, 100),
+  ('Pro+', 10, 1000)
+ON CONFLICT (product_title) DO NOTHING;
