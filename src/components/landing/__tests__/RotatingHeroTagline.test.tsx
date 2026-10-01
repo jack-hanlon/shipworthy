@@ -1,18 +1,19 @@
 /**
  * @module RotatingHeroTagline tests
- * Tagline index wrap, scramble frames, and the rotating hero headline.
+ * Tagline index wrap, word split / assemble duration, and the rotating hero headline.
  */
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-    cipherGlyph,
+    ASSEMBLE_STAGGER_S,
+    ASSEMBLE_WORD_DURATION_S,
+    assembleDurationS,
+    EXIT_DURATION_S,
     HERO_TAGLINE_HOLD_MS,
     HERO_TAGLINES,
     nextHeroTaglineIndex,
     RotatingHeroTagline,
-    scrambleDurationS,
-    scrambleFrame,
-    SCRAMBLE_CIPHER,
+    splitTaglineWords,
 } from "../RotatingHeroTagline";
 
 let reducedMotion = false;
@@ -32,28 +33,27 @@ describe("nextHeroTaglineIndex", () => {
     });
 });
 
-describe("scrambleFrame", () => {
-    const target = "Ab cd.";
-
-    it("keeps spaces and punctuation, and locks every letter when elapsed is past the duration", () => {
-        expect(scrambleFrame(target, scrambleDurationS(target), () => 0)).toBe(
-            target,
-        );
+describe("splitTaglineWords", () => {
+    it("splits on spaces and drops empty segments", () => {
+        expect(splitTaglineWords("Chat in. Structured artifact out.")).toEqual([
+            "Chat",
+            "in.",
+            "Structured",
+            "artifact",
+            "out.",
+        ]);
+        expect(splitTaglineWords("a  b")).toEqual(["a", "b"]);
+        expect(splitTaglineWords("")).toEqual([]);
     });
+});
 
-    it("decrypts the first letter while the rest stays ciphertext", () => {
-        const frame = scrambleFrame(target, scrambleDurationS("A"), () => 0);
-        expect(frame.startsWith("A")).toBe(true);
-        expect(frame.endsWith(".")).toBe(true);
-        expect(frame.includes("cd")).toBe(false);
-    });
-
-    it("starts as ciphertext and keeps spaces and the period", () => {
-        const frame = scrambleFrame(target, 0, () => 0);
-        expect(frame).toBe(
-            `${SCRAMBLE_CIPHER[0]}${cipherGlyph(1, "b")} ${cipherGlyph(3, "c")}${cipherGlyph(4, "d")}.`,
+describe("assembleDurationS", () => {
+    it("returns zero for an empty line and stagger+duration for words", () => {
+        expect(assembleDurationS(0)).toBe(0);
+        expect(assembleDurationS(1)).toBe(ASSEMBLE_WORD_DURATION_S);
+        expect(assembleDurationS(3)).toBe(
+            2 * ASSEMBLE_STAGGER_S + ASSEMBLE_WORD_DURATION_S,
         );
-        expect(/[A-Za-z]/.test(frame)).toBe(false);
     });
 });
 
@@ -64,7 +64,7 @@ describe("RotatingHeroTagline", () => {
         vi.useRealTimers();
     });
 
-    it("starts on the first tagline and advances the accessible name after the hold", () => {
+    it("starts on the first tagline and advances the accessible name after hold + exit", () => {
         vi.useFakeTimers();
         render(<RotatingHeroTagline />);
 
@@ -74,6 +74,14 @@ describe("RotatingHeroTagline", () => {
 
         act(() => {
             vi.advanceTimersByTime(HERO_TAGLINE_HOLD_MS);
+        });
+
+        expect(screen.getByRole("heading", { level: 1 }).getAttribute("aria-label")).toBe(
+            HERO_TAGLINES[0],
+        );
+
+        act(() => {
+            vi.advanceTimersByTime(EXIT_DURATION_S * 1000);
         });
 
         expect(screen.getByRole("heading", { level: 1 }).getAttribute("aria-label")).toBe(
@@ -93,7 +101,7 @@ describe("RotatingHeroTagline", () => {
         expect(screen.getByRole("heading", { level: 1 }).getAttribute("aria-label")).toBe(
             HERO_TAGLINES[0],
         );
-        expect(screen.getByTestId("hero-tagline").getAttribute("data-frame")).toBe(
+        expect(screen.getByTestId("hero-tagline").getAttribute("data-text")).toBe(
             HERO_TAGLINES[0],
         );
     });
